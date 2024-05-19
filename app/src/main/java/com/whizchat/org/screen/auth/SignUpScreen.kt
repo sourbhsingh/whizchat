@@ -120,7 +120,12 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
 
              )
      Button(onClick = {
-         //Todo
+         vm.signUp(
+             nameState.value.text ,
+
+             emailState.value.text,
+             passState.value.text
+         )
      },
          colors =  ButtonDefaults.buttonColors(Color.Magenta)
          ,modifier =
