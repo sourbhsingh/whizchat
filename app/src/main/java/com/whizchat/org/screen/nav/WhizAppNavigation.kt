@@ -9,6 +9,7 @@ import androidx.navigation.compose.rememberNavController
 import com.whizchat.org.WapViewModel
 import com.whizchat.org.screen.DestinationScreen
 import com.whizchat.org.screen.auth.*
+import com.whizchat.org.screen.chatscreen.ChatListScreen
 
 
 @Composable
@@ -20,7 +21,13 @@ fun WhizAppNavigation(modifier: Modifier = Modifier) {
             SignUpScreen(navController,viewmodel)
         }
         composable(DestinationScreen.Login.route){
-//            LoginScreen(navController,viewmodel)
+              LoginScreen(navController,viewmodel)
         }
+        composable(DestinationScreen.ChatList.route){
+              ChatListScreen(navController,viewmodel)
+        }
+//        composable(DestinationScreen.Login.route){
+//              LoginScreen(navController,viewmodel)
+//        }
     }
 }

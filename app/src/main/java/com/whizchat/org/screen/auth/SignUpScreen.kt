@@ -1,23 +1,16 @@
 package com.whizchat.org.screen.auth
 
-import android.net.Uri
-
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,17 +25,20 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.whizchat.org.R
 import com.whizchat.org.WapViewModel
+import com.whizchat.org.data.CommonProgressBar
+import com.whizchat.org.data.checkSignedIn
 import com.whizchat.org.screen.DestinationScreen
-import com.whizchat.org.screen.navigateTo
+import com.whizchat.org.data.navigateTo
 
 @Composable
 fun SignUpScreen(navController: NavController , vm: WapViewModel) {
+
+    checkSignedIn(vm , navController)
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.CenterStart ) {
          Column(modifier = Modifier
@@ -55,6 +51,7 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
              val nameState = remember {
                  mutableStateOf(TextFieldValue())
              }
+
              val phnState = remember {
                  mutableStateOf(TextFieldValue())
              }
@@ -122,7 +119,7 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
      Button(onClick = {
          vm.signUp(
              nameState.value.text ,
-
+             phnState.value.text,
              emailState.value.text,
              passState.value.text
          )
@@ -134,7 +131,7 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
          Text(text = "Sign Up")
      }
 
-             Text(text = "Already a User? Click here to Login _>" , color= Color.Blue ,
+             Text(text = "Already a User? Click here to Login ->" , color= Color.Blue ,
                modifier = Modifier
                    .padding(8.dp)
                    .clickable {
@@ -143,15 +140,11 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
          }
 
 
-//        Row(verticalAlignment = Alignment.CenterVertically ) {
-//            Text(
-//                text = "Navigate to Other Screen", modifier = Modifier.clickable {
-//                    navController.navigate(DestinationScreen.Login.route)
-//                },
-//                textAlign = TextAlign.Center
-//            )
-//        }
+     if (vm.inProgress.value){
+         CommonProgressBar()
+     }
     }
 
 
 }
+
