@@ -1,6 +1,7 @@
 package com.whizchat.org
 
 import android.content.ContentValues.TAG
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
@@ -15,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.toObject
+import com.google.firebase.storage.FirebaseStorage
 import com.whizchat.org.data.Event
 import com.whizchat.org.data.USER_NODE
 import com.whizchat.org.data.UserData
@@ -22,12 +24,14 @@ import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class WapViewModel @Inject constructor(
     private val auth : FirebaseAuth,
-    private val db :  FirebaseFirestore
+    private val db :  FirebaseFirestore,
+    private  val storage : FirebaseStorage
 ) : ViewModel()  {
     var inProgress = mutableStateOf(false)
     var evenMutablestate = mutableStateOf<Event<String>?>(null)
@@ -138,110 +142,6 @@ class WapViewModel @Inject constructor(
         }
     }
 
-//    fun signUp ( name : String ,number: String ,
-//                 email : String,  password : String)
-//
-//    {
-//        inProgress.value= true
-//        if(name.isEmpty() or number.isEmpty() or email.isEmpty() or password.isEmpty()){
-//            handleException(custumMessage = "Please fill all the fields")
-//            return
-//        }
-//        inProgress.value = true
-//        db.collection(USER_NODE).whereEqualTo("number",number).get().addOnSuccessListener {
-//            if(it.isEmpty){
-//                auth.createUserWithEmailAndPassword(email, password) .addOnCompleteListener{
-//                    if(it.isSuccessful){
-//                        signIn.value = true
-//                        createOrUpdateProfile( name , number)
-//                        Log.d("Tag", "signUP: UserLoggedIN")
-//                    }
-//                    else{
-//                        handleException(it.exception, custumMessage = "SignUp Failed")
-//                    }
-//                }
-//            }
-//            else{
-//                handleException(custumMessage = "Phone number already registered")
-//
-//            }
-//        }
-//        auth.createUserWithEmailAndPassword(email, password) .addOnCompleteListener{
-//            if(it.isSuccessful){
-//                signIn.value = true
-//                createOrUpdateProfile( name , number)
-//                Log.d("Tag", "signUP: UserLoggedIN")
-//            }
-//            else{
-//                handleException(it.exception, custumMessage = "SignUp Failed")
-//            }
-//        }
-//    }
-//
-//    fun login(email: String , password: String){
-//        if(email.isEmpty() or password.isEmpty()){
-//            handleException(custumMessage = "Please fill all fields")
-//            return
-//        }
-//        else{
-//            inProgress.value = true
-//            auth.signInWithEmailAndPassword(email,password).
-//                    addOnCompleteListener{
-//                        if(it.isSuccessful){
-//                            signIn.value = true
-//                            inProgress.value = false
-//                            auth.currentUser?.uid?.let {
-//                                getUserData(it)
-//                            }
-//                        }
-//                        else{
-//                            handleException(exception = it.exception , custumMessage = "Login failed")
-//                        }
-//                    }
-//        }
-//    }
-//    private fun createOrUpdateProfile(name: String?= null, number: String?= null , imageUrl : String? = null) {
-//            var uid = auth.currentUser?.uid
-//            val userData = UserData(
-//                userId = uid,
-//                name = name?: userData.value?.name,
-//                number = number?: userData.value?.number,
-//                imageUrl = imageUrl?: userData.value?.imageUrl
-//            )
-//
-//        uid?.let {
-//            inProgress.value = true
-//            db.collection(USER_NODE).document(uid).get().addOnSuccessListener {
-//                if(it.exists()){
-//                    //todo {update data}
-//                }
-//                else {
-//                    db.collection(USER_NODE).document(uid).set(userData)
-//                    inProgress.value = false
-//                    getUserData(uid)
-//                }
-//            }
-//                .addOnFailureListener{
-//                    handleException(it, "Cannot Retrieve User")
-//                }
-//
-//        }
-//    }
-//
-//    private fun getUserData(uid: String) {
-//        inProgress.value = true
-//        db.collection(USER_NODE).document(uid).addSnapshotListener{
-//            value, error ->
-//            if(error!= null){
-//                handleException(error, "Cannot Retrieve User")
-//            }
-//            if(value!= null){
-//                var user = value.toObject<UserData>()
-//                userData.value = user
-//                inProgress.value = false
-//            }
-//        }
-//    }
 
     fun handleException( exception: Exception?= null ,message : String = ""){
         Log.e("Whizchat", "Whizchat exception : ", exception)
@@ -250,6 +150,33 @@ class WapViewModel @Inject constructor(
         val messsage = if(message.isNullOrEmpty()) errorMsg else message
         evenMutablestate.value = Event(messsage)
         inProgress.value = false
+    }
+
+    fun uploadProfileImage(uri: Uri) {
+         uploadImage(uri){
+            createOrUpdateProfile(imageUrl = it.toString())
+         }
+    }
+    fun logout(){
+        auth.signOut()
+        signIn.value = false
+        userData.value =null
+        evenMutablestate.value = Event("Logged Out")
+    }
+    fun uploadImage(uri: Uri,  onSuccess :(Uri)->Unit){
+        inProgress.value= true
+        val storageRef = storage.reference
+        val uuid = UUID.randomUUID()
+        val imageRef= storageRef.child("images/$uuid")
+        val uploadTask = imageRef.putFile(uri)
+        uploadTask.addOnSuccessListener {
+            val result = it.metadata?.reference?.downloadUrl
+            result?.addOnSuccessListener(onSuccess)
+            inProgress.value = false
+        }
+            .addOnFailureListener{
+                handleException(it)
+            }
     }
 }
 

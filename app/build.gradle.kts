@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
+    implementation(libs.firebase.storage)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,5 +84,9 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:$nav_version")
     implementation("androidx.hilt:hilt-navigation-fragment:1.2.0")
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation ("jp.wasabeef:blurry:4.0.0")
+    implementation("io.coil-kt:coil-compose:2.6.0")
+
+
 }
 

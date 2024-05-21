@@ -32,7 +32,7 @@ import com.whizchat.org.R
 import com.whizchat.org.WapViewModel
 import com.whizchat.org.data.CommonProgressBar
 import com.whizchat.org.data.checkSignedIn
-import com.whizchat.org.screen.DestinationScreen
+import com.whizchat.org.screen.nav.DestinationScreen
 import com.whizchat.org.data.navigateTo
 
 @Composable

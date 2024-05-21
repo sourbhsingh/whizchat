@@ -16,6 +16,7 @@ firebaseStorage = "21.0.0"
 firebaseFirestore = "25.0.0"
 
 [libraries]
+accompanist-blur = "com.google.accompanist:accompanist-blur:0.30.1"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }

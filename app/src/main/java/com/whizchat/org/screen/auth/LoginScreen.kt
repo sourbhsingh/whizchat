@@ -1,7 +1,6 @@
 package com.whizchat.org.screen.auth
 
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -36,7 +35,7 @@ import com.whizchat.org.WapViewModel
 import com.whizchat.org.data.CommonProgressBar
 import com.whizchat.org.data.checkSignedIn
 import com.whizchat.org.data.navigateTo
-import com.whizchat.org.screen.DestinationScreen
+import com.whizchat.org.screen.nav.DestinationScreen
 
 @Composable
 fun LoginScreen(navController: NavController, vm : WapViewModel) {

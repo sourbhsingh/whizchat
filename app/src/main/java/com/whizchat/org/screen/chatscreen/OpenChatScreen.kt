@@ -6,6 +6,6 @@ import androidx.navigation.NavController
 import com.whizchat.org.WapViewModel
 
 @Composable
-fun OpenChatScreen(modifier: Modifier = Modifier, navController: NavController, vm : WapViewModel) {
+fun OpenChatScreen( navController: NavController, vm : WapViewModel) {
 
 }
