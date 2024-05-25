@@ -2,6 +2,7 @@ package com.whizchat.org.screen.component
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -12,8 +13,11 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -33,6 +37,8 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.whizchat.org.WapViewModel
@@ -62,6 +68,7 @@ fun ProfileScren( navController: NavController ,vm : WapViewModel ) {
 
             ProfileContent(modifier = Modifier
                 .weight(1f)
+
                 .verticalScroll(
                     rememberScrollState()
                 )
@@ -84,11 +91,13 @@ fun ProfileScren( navController: NavController ,vm : WapViewModel ) {
                 }
 
             )
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.fillMaxHeight().weight(1f))
             BottomNavScreen(
                 selectedItem = BottomNavigationItem.PROFILE,
                 navController = navController
             )
+            Spacer(modifier = Modifier.navigationBarsPadding())
+
         }
         }
 
@@ -151,9 +160,13 @@ fun ProfileContent(
             .fillMaxWidth()
             .padding(16.dp),
             horizontalArrangement = Arrangement.Center) {
-            Text(text = "LogOut", modifier = Modifier.clickable {
-                onLogOut.invoke()
-            })
+            Text(text = "LogOut", fontWeight = FontWeight.SemiBold,modifier = Modifier
+                .clickable {
+                    onLogOut.invoke()
+                }
+                .padding(top = 64.dp)
+                .background(Color.Magenta)
+                .padding(8.dp))
         }
     }
 

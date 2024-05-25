@@ -8,22 +8,33 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentCompositionLocalContext
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
+import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.Filter
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.snapshots
 import com.google.firebase.firestore.toObject
+import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import com.whizchat.org.data.CHATS
+import com.whizchat.org.data.ChatData
+import com.whizchat.org.data.ChatUser
 import com.whizchat.org.data.Event
+import com.whizchat.org.data.MESSAGE
+import com.whizchat.org.data.Message
 import com.whizchat.org.data.USER_NODE
 import com.whizchat.org.data.UserData
 import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
+import java.util.Calendar
 import java.util.UUID
 import javax.inject.Inject
 
@@ -34,10 +45,14 @@ class WapViewModel @Inject constructor(
     private  val storage : FirebaseStorage
 ) : ViewModel()  {
     var inProgress = mutableStateOf(false)
+    var inProgressChats = mutableStateOf(false)
     var evenMutablestate = mutableStateOf<Event<String>?>(null)
     var signIn = mutableStateOf(false)
     var userData = mutableStateOf<UserData?>(null)
-
+    var chats = mutableStateOf<List<ChatData>>(listOf())
+    var chatMessages = mutableStateOf<List<Message>>(listOf())
+    val inProgressChatMessage = mutableStateOf(false)
+    var currentChatMessageListener: ListenerRegistration?= null
     init {
          val currentUser = auth.currentUser
          signIn.value = currentUser != null
@@ -137,7 +152,7 @@ class WapViewModel @Inject constructor(
                 val user = value.toObject<UserData>()
                 userData.value = user
                 inProgress.value = false
-
+                populateChats()
             }
         }
     }
@@ -177,6 +192,110 @@ class WapViewModel @Inject constructor(
             .addOnFailureListener{
                 handleException(it)
             }
+    }
+
+    fun onAddChat(number: String) {
+        if (number.isEmpty() or !number.isDigitsOnly()) {
+            handleException(message = "Number must be contain digits only")
+        } else {
+            db.collection(CHATS).where(
+                Filter.or(
+                    Filter.and(
+                        Filter.equalTo("user1.number", number),
+                        Filter.equalTo("user2.number", userData.value?.number)
+                    ),
+                    Filter.and(
+                        Filter.equalTo("user2.number", userData.value?.number),
+                        Filter.equalTo("user1.number", number)
+                    )
+                )
+            ).get().addOnSuccessListener {
+                if (it.isEmpty) {
+                    db.collection(USER_NODE).whereEqualTo("number", number).get()
+                        .addOnSuccessListener {
+                            if (it.isEmpty) {
+                                handleException(message = "Number not found")
+                            } else {
+                                val chatPartner = it.toObjects<UserData>()[0]
+                                val id = db.collection(CHATS).document().id
+                                val chat = ChatData(
+                                    chatId = id,
+                                    ChatUser(
+                                        userData.value?.userId,
+                                        userData.value?.name,
+                                        userData.value?.number,
+                                        userData.value?.imageUrl
+                                    ),
+                                    ChatUser(
+                                        chatPartner.userId,
+                                        chatPartner.name,
+                                        chatPartner.number,
+                                        chatPartner.imageUrl,
+                                    )
+                                )
+                                db.collection(CHATS).document(id).set(chat)
+                            }
+                        }
+                        .addOnFailureListener {
+                            handleException(it)
+                        }
+                } else {
+                    handleException(message = "Chats already exist")
+                }
+            }
+        }
+    }
+
+    private fun populateChats() {
+        inProgressChats.value = true
+        db.collection(CHATS).where(
+            Filter.or(
+                Filter.equalTo("user1.userId", userData.value?.userId),
+                Filter.equalTo("user2.userId", userData.value?.userId),
+            )
+        ).addSnapshotListener { value, error ->
+            if (error != null) {
+                handleException(error)
+            }
+            if (value != null) {
+                chats.value = value.documents.mapNotNull {
+                    it.toObject<ChatData>()
+
+                }
+                inProgressChats.value = false
+            }
+        }
+    }
+
+
+    fun onSendReply(chatId: String , message : String){
+        val time = Calendar.getInstance().time.toString()
+        val msg = Message(userData.value?.userId , message ,time)
+        db.collection(CHATS).document(chatId).collection(MESSAGE).document().set(msg)
+    }
+
+
+    fun populateMessasges(chatId : String)
+    {
+        inProgressChatMessage.value =true
+        currentChatMessageListener = db.collection(CHATS).document(chatId).collection(MESSAGE).addSnapshotListener { value, error ->
+            if(error!= null){
+                handleException(error)
+            }
+            if(value!= null){
+                chatMessages.value = value.documents.mapNotNull {
+                    it.toObject<Message>()
+                }.sortedBy {
+                    it.timeStamp
+                }
+                inProgressChatMessage.value = false
+            }
+        }
+    }
+
+    fun dePopulate(){
+        chatMessages.value = listOf()
+        currentChatMessageListener = null
     }
 }
 

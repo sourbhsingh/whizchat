@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -24,6 +25,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -85,6 +87,7 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
                      nameState.value = it
                  },
                  label = { Text(text = "Name")},
+
                  modifier = Modifier.padding(8.dp)
 
              )
@@ -94,6 +97,8 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
                  onValueChange = {
                      phnState.value = it
                  },
+                 maxLines = 1 ,
+                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                  label = { Text(text = "Phone No.")},
                  modifier = Modifier.padding(8.dp)
 
@@ -103,6 +108,7 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
                  onValueChange = {
                      emailState.value = it
                  },
+         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                  label = { Text(text = "Email")},
                  modifier = Modifier.padding(8.dp)
 
@@ -112,6 +118,8 @@ fun SignUpScreen(navController: NavController , vm: WapViewModel) {
                  onValueChange = {
                      passState.value = it
                  },
+
+
                  label = { Text(text = "Password")},
                  modifier = Modifier.padding(8.dp)
 

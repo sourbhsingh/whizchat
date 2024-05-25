@@ -81,6 +81,7 @@ fun LoginScreen(navController: NavController, vm : WapViewModel) {
                emailState.value = it
             },
             label = { Text(text = "Email")},
+            maxLines = 1,
             modifier = Modifier.padding(8.dp)
 
          )
@@ -90,6 +91,7 @@ fun LoginScreen(navController: NavController, vm : WapViewModel) {
                passState.value = it
             },
             label = { Text(text = "Password")},
+            maxLines = 1,
             modifier = Modifier.padding(8.dp)
 
          )

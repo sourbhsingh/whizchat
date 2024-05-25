@@ -9,7 +9,9 @@ import androidx.navigation.compose.rememberNavController
 import com.whizchat.org.WapViewModel
 import com.whizchat.org.screen.auth.*
 import com.whizchat.org.screen.chatscreen.ChatListScreen
+import com.whizchat.org.screen.chatscreen.OpenChatScreen
 import com.whizchat.org.screen.component.ProfileScren
+import com.whizchat.org.screen.status.OpenStatusScreen
 import com.whizchat.org.screen.status.StatusScreen
 
 
@@ -33,6 +35,16 @@ fun WhizAppNavigation(modifier: Modifier = Modifier) {
       composable(DestinationScreen.StatusList.route){
               StatusScreen(navController, viewmodel)
         }
+        composable(DestinationScreen.OpenChat.route){
+            val chatId = it.arguments?.getString("chatId")
+            chatId?.let{
+                OpenChatScreen(navController, viewmodel , chatId)
+
+            }
+        }
+//        composable(DestinationScreen.OpenStatus.route){
+//            OpenStatusScreen(navController, viewmodel , chatId)
+//        }
 
     }
 }
