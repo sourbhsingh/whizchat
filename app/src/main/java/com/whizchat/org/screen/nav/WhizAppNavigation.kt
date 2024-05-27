@@ -38,13 +38,17 @@ fun WhizAppNavigation(modifier: Modifier = Modifier) {
         composable(DestinationScreen.OpenChat.route){
             val chatId = it.arguments?.getString("chatId")
             chatId?.let{
-                OpenChatScreen(navController, viewmodel , chatId)
+                OpenChatScreen(navController, viewmodel , it)
 
             }
         }
-//        composable(DestinationScreen.OpenStatus.route){
-//            OpenStatusScreen(navController, viewmodel , chatId)
-//        }
+        composable(DestinationScreen.OpenStatus.route){
+            val userId = it.arguments?.getString("userId")
+            userId?.let{
+            OpenStatusScreen(navController, viewmodel ,  it)
+        }
+
+        }
 
     }
 }

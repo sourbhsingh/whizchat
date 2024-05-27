@@ -28,6 +28,8 @@ import com.whizchat.org.data.ChatUser
 import com.whizchat.org.data.Event
 import com.whizchat.org.data.MESSAGE
 import com.whizchat.org.data.Message
+import com.whizchat.org.data.STATUS
+import com.whizchat.org.data.Status
 import com.whizchat.org.data.USER_NODE
 import com.whizchat.org.data.UserData
 import dagger.hilt.android.internal.Contexts.getApplication
@@ -53,6 +55,8 @@ class WapViewModel @Inject constructor(
     var chatMessages = mutableStateOf<List<Message>>(listOf())
     val inProgressChatMessage = mutableStateOf(false)
     var currentChatMessageListener: ListenerRegistration?= null
+    val status = mutableStateOf<List<Status>>(listOf())
+    val inProgressStatus = mutableStateOf(false)
     init {
          val currentUser = auth.currentUser
          signIn.value = currentUser != null
@@ -153,6 +157,8 @@ class WapViewModel @Inject constructor(
                 userData.value = user
                 inProgress.value = false
                 populateChats()
+                populateStatus()
+
             }
         }
     }
@@ -176,6 +182,8 @@ class WapViewModel @Inject constructor(
         auth.signOut()
         signIn.value = false
         userData.value =null
+        dePopulate()
+        currentChatMessageListener = null
         evenMutablestate.value = Event("Logged Out")
     }
     fun uploadImage(uri: Uri,  onSuccess :(Uri)->Unit){
@@ -292,11 +300,75 @@ class WapViewModel @Inject constructor(
             }
         }
     }
+    fun populateStatus()
+    {
+        val timeDelta = 24L * 60 * 60 *1000
+        val cutoff = System.currentTimeMillis()-timeDelta
+
+        inProgressStatus.value =true
+        db.collection(CHATS).where(
+            Filter.or(
+                Filter.equalTo("user1.userId",userData.value?.userId),
+                Filter.equalTo("user2.userId",userData.value?.userId)
+            )
+        ).addSnapshotListener { value,
+                                error ->
+            if(error!= null){
+                handleException(error)
+            }
+            if(value!= null){
+                val currentConnections = arrayListOf(userData.value?.userId)
+                val chats = value.toObjects<ChatData>()
+                    chats.forEach{
+                        chat->
+                        if(chat.user1.userId==userData.value?.userId){
+                            currentConnections.add(chat.user2.userId)
+                        }
+                        else currentConnections.add(chat.user1.userId)
+                    }
+                db.collection(STATUS).whereGreaterThan("timestamp",cutoff).whereIn("user.userId",currentConnections)
+                    .addSnapshotListener { value, error ->
+                        if(error!= null){
+                            handleException(error)
+                        }
+                        if(value!= null){
+                            status.value=  value.toObjects()
+                            inProgressStatus.value = false
+
+                        }                        }
+                    }
+            }
+
+
+
+    }
 
     fun dePopulate(){
         chatMessages.value = listOf()
         currentChatMessageListener = null
     }
+        fun createStatus(imageUrl: String){
+            val newStatus = Status(
+                ChatUser(
+                    userData.value?.userId,
+                    userData.value?.name,
+                    userData.value?.imageUrl,
+                    userData.value?.number
+                ),
+                imageUrl,
+                System.currentTimeMillis()
+            )
+
+            db.collection(STATUS).document().set(newStatus)
+        }
+
+    fun uploadStatus(uri: Uri) {
+          uploadImage(uri){
+              createStatus(it.toString())
+          }
+    }
+
+
 }
 
 
