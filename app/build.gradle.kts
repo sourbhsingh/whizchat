@@ -86,7 +86,7 @@ dependencies {
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation ("jp.wasabeef:blurry:4.0.0")
     implementation("io.coil-kt:coil-compose:2.6.0")
-
+    implementation("com.google.ai.client.generativeai:generativeai:0.7.0")
 
 }
 

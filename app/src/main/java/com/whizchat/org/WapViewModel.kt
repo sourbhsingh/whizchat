@@ -6,12 +6,16 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentCompositionLocalContext
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.core.text.isDigitsOnly
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.content
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.Filter
@@ -22,7 +26,10 @@ import com.google.firebase.firestore.snapshots
 import com.google.firebase.firestore.toObject
 import com.google.firebase.firestore.toObjects
 import com.google.firebase.storage.FirebaseStorage
+import com.whizchat.org.data.APIKEY
 import com.whizchat.org.data.CHATS
+import com.whizchat.org.data.ChatBotData
+import com.whizchat.org.data.ChatBotRoleEnum
 import com.whizchat.org.data.ChatData
 import com.whizchat.org.data.ChatUser
 import com.whizchat.org.data.Event
@@ -34,6 +41,7 @@ import com.whizchat.org.data.USER_NODE
 import com.whizchat.org.data.UserData
 import dagger.hilt.android.internal.Contexts.getApplication
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.lang.Exception
 import java.util.Calendar
@@ -64,7 +72,28 @@ class WapViewModel @Inject constructor(
             getUserData(it)
         }
     }
+    val list by lazy {
+        mutableStateListOf<ChatBotData>()
+    }
+    private val genAI by lazy {
+        GenerativeModel(
+            modelName = "gemini-pro",
+            apiKey = APIKEY
+        )
 
+    }
+    fun sendChatbotMesg(message: String) = viewModelScope.launch {
+        var chat = genAI.startChat()
+        list.add(ChatBotData(message,ChatBotRoleEnum.USER.role))
+     chat.sendMessage(
+         content(ChatBotRoleEnum.USER.role) {
+             text(message)
+         }
+     ).text?.let {
+         list.add(ChatBotData(it , ChatBotRoleEnum.MODEL.role))
+     }
+
+    }
 
     fun signUp(name: String, number: String, email: String, password: String) {
         inProgress.value = true

@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -96,6 +97,13 @@ fun CommonImage(data: String? ,
     val painter = rememberAsyncImagePainter(data)
     Image(painter = painter, contentDescription ="null", modifier = modifier, contentScale= contentScale )
 }
+@Composable
+fun BotImage(
+                modifier: Modifier = Modifier.wrapContentSize(),
+                contentScale: ContentScale = ContentScale.Crop) {
+    val painter = painterResource(R.drawable.chatbot)
+    Image(painter = painter, contentDescription ="null", modifier = modifier, contentScale= contentScale )
+}
 
 
 @Composable
@@ -121,6 +129,28 @@ fun CommonRow(imageUrl :String? , name : String? , onItemClick : () -> Unit) {
             .background(Color.Magenta))
 
         Text(text = name ?: "-----" , fontWeight = FontWeight.SemiBold , modifier = Modifier.padding(start = 6.dp))
+    }
+
+}
+
+@Composable
+fun BotRow( onItemClick : () -> Unit) {
+    Row(modifier = Modifier
+        .fillMaxWidth()
+        .height(75.dp)
+        .clickable {
+            onItemClick.invoke()
+        }, verticalAlignment = Alignment.CenterVertically)
+    {
+        BotImage( modifier= Modifier
+            .padding(8.dp)
+            .size(50.dp)
+            .clip(
+                CircleShape
+            )
+            .background(Color.White))
+
+        Text(text = "Gennie - Smart AI Assistant", fontWeight = FontWeight.SemiBold , modifier = Modifier.padding(start = 6.dp))
     }
 
 }

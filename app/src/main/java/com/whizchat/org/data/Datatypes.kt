@@ -43,3 +43,13 @@ data class Status(val user : ChatUser  = ChatUser(),
     val imageUrl : String?=""
 , val timeStemp : Long?=null,
     )
+
+data class ChatBotData(
+    val message : String ,
+    val role  : String
+)
+
+enum class ChatBotRoleEnum(val role : String){
+    USER("user"),
+    MODEL("model")
+}

@@ -2,6 +2,9 @@ package com.whizchat.org.screen.chatscreen
 
 
 import android.app.Dialog
+import android.widget.ImageButton
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 
@@ -16,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -32,11 +36,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerIcon.Companion.Text
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.FloatingWindow
 import androidx.navigation.NavController
+import com.whizchat.org.R
 import com.whizchat.org.WapViewModel
+import com.whizchat.org.data.BotRow
 import com.whizchat.org.data.CommonProgressBar
 import com.whizchat.org.data.CommonRow
 import com.whizchat.org.data.TitleText
@@ -77,7 +85,16 @@ fun ChatListScreen(navController: NavController, viewModel: WapViewModel) {
                         .fillMaxSize()
                         .padding(it)
                 ) {
-                    TitleText(text = "Chats")
+                    Column  (horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.SpaceEvenly){
+                           TitleText(text = "Chats")
+
+                            BotRow() {
+                                navigateTo(navController, route = DestinationScreen.OpenChatBot.route)
+
+                            }
+
+                    }
+
                     if (chats.isEmpty()) {
                         Column(
                             modifier = Modifier
@@ -116,84 +133,6 @@ fun ChatListScreen(navController: NavController, viewModel: WapViewModel) {
     }
 
 }
-//
-//fun ChatListScreen( navController: NavController, vm : WapViewModel) {
-//
-//    val inProgress = vm.inProgress
-//    if(inProgress.value) {
-//        CommonProgressBar()
-//    }
-//    else {
-//      val chats =   vm.chats.value
-//        val userData = vm.userData.value
-//        val showDailogue = remember {
-//            mutableStateOf(false)
-//        }
-//        val onFabClick: () -> Unit= {showDailogue.value= true}
-//        val onDismiss:()-> Unit = {
-//            showDailogue.value = false
-//        }
-//       val  onAddChat:(String)-> Unit= {
-//           vm.onAddChat(it)
-//           showDailogue.value = false
-//       }
-//
-//        Scaffold(floatingActionButton = {
-//                FAB(
-//                    showDialog = showDailogue.value,
-//                    onFabClick = onFabClick,
-//                    onDismiss = onDismiss,
-//                    onAddChat = onAddChat
-//                )
-//
-//        }
-//        , content = {
-//            Column(modifier = Modifier
-//                .fillMaxSize()
-//                .padding(it)) {
-//                TitleText(text ="Chats")
-//                if(chats.isEmpty()){
-//                    Column (modifier = Modifier
-//                        .fillMaxWidth()
-//                        .weight(1f)
-//                    , horizontalAlignment = Alignment.CenterHorizontally,
-//                        verticalArrangement = Arrangement.Center ,
-//                        content = { androidx.compose.material3.Text(text = "No Chats Avialable") })
-//
-//                }
-//                else{
-//                    LazyColumn (modifier = Modifier.weight(1f)){
-//                        items(chats){
-//                            chat ->
-//                            val chatUser = if(chat.user1.UserId == userData?.userId){
-//                                chat.user2
-//                            }
-//                            else {
-//                                chat.user1
-//                            }
-//                            CommonRow(imageUrl = chatUser.imageUrl, name = chatUser.name) {
-//                                chat.chatId?.let {
-//                                    navigateTo(navController = navController, route =  DestinationScreen.OpenChat.createRoute(id = it))
-//                                }
-//
-//                            }
-//                        }
-//                    }
-//                }
-//
-//
-//                BottomNavScreen(selectedItem = BottomNavigationItem.CHATLIST , navController = navController)
-//
-//
-//            }
-//            }
-//            )
-//    }
-//
-//
-//
-//}
-
 
 @Composable
 fun FAB(

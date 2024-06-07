@@ -12,4 +12,6 @@ sealed class DestinationScreen (val route : String){
     object OpenStatus : DestinationScreen("openStatus/{userId}"){
         fun createRoute(userId : String) = "openChat/$userId"
     }
+    object OpenChatBot : DestinationScreen("chatBot")
 }
+

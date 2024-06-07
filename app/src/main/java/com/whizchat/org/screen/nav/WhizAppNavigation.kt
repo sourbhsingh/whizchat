@@ -10,6 +10,7 @@ import com.whizchat.org.WapViewModel
 import com.whizchat.org.screen.auth.*
 import com.whizchat.org.screen.chatscreen.ChatListScreen
 import com.whizchat.org.screen.chatscreen.OpenChatScreen
+import com.whizchat.org.screen.chatscreen.chatbot.ChatbotScreen
 import com.whizchat.org.screen.component.ProfileScren
 import com.whizchat.org.screen.status.OpenStatusScreen
 import com.whizchat.org.screen.status.StatusScreen
@@ -48,6 +49,9 @@ fun WhizAppNavigation(modifier: Modifier = Modifier) {
             OpenStatusScreen(navController, viewmodel ,  it)
         }
 
+        }
+        composable(DestinationScreen.OpenChatBot.route){
+            ChatbotScreen(navController,viewmodel)
         }
 
     }
